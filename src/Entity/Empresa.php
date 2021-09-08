@@ -7,6 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass=EmpresaRepository::class)
+ * @ORM\Table(name="empresa")
  */
 class Empresa
 {
@@ -36,6 +37,11 @@ class Empresa
      * @ORM\Column(type="string", length=80, nullable=true)
      */
     private $sector;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=false)
+     */
+    private $activo;
 
     public function getId(): ?int
     {
@@ -86,6 +92,18 @@ class Empresa
     public function setSector(?string $sector): self
     {
         $this->sector = $sector;
+
+        return $this;
+    }
+
+    public function getActivo(): ?bool
+    {
+        return $this->activo;
+    }
+
+    public function setActivo(bool $activo): self
+    {
+        $this->activo = $activo;
 
         return $this;
     }

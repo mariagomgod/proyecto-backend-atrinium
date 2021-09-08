@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>{% block title %}Empresas{% endblock %}</title>
+        {# Run `composer require symfony/webpack-encore-bundle`
+           and uncomment the following Encore helpers to start using Symfony UX #}
+        {% block stylesheets %}
+            {#{{ encore_entry_link_tags('app') }}#}
+        {% endblock %}
+
+        {% block javascripts %}
+            {#{{ encore_entry_script_tags('app') }}#}
+        {% endblock %}
+    </head>
+    <table>
+    <tr>
+        <th>Id_empresa</th>
+        <th>Nombre</th>
+        <th>Teléfono</th>
+        <th>E-mail</th>
+        <th>Sector</th>
+    </tr>
+
+    {% for empresa in Empresas %}
+        <tr>
+            <td>{{empresa.getIdEmpresa()}}</td>
+            <td>{{empresa.getNombre()}}</td>
+            <td>{{empresa.getTelefono()}}</td>
+            <td>{{empresa.getEmail()}}</td>
+            <td>{{empresa.getSector()}}</td>
+        </tr>
+    {% endfor %}
+    </table>
+</html>

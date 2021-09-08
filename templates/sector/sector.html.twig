@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>{% block title %}Sectores{% endblock %}</title>
+        {# Run `composer require symfony/webpack-encore-bundle`
+           and uncomment the following Encore helpers to start using Symfony UX #}
+        {% block stylesheets %}
+            {#{{ encore_entry_link_tags('app') }}#}
+        {% endblock %}
+
+        {% block javascripts %}
+            {#{{ encore_entry_script_tags('app') }}#}
+        {% endblock %}
+    </head>
+    <table>
+    <tr>
+        <th>Id_sector</th>
+        <th>Nombre</th>
+    </tr>
+
+    {% for sector in Sectores %}
+        <tr>
+            <td>{{sector.getIdEmpresa()}}</td>
+            <td>{{sector.getNombre()}}</td>
+        </tr>
+    {% endfor %}
+    </table>
+</html>
