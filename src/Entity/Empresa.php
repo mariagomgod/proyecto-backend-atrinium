@@ -85,12 +85,12 @@ class Empresa
         return $this;
     }
 
-    public function getSector(): ?int
+    public function getSector(): ?Sector
     {
         return $this->sector;
     }
 
-    public function setSector(?int $sector): self
+    public function setSector(?Sector $sector): self
     {
         $this->sector = $sector;
 

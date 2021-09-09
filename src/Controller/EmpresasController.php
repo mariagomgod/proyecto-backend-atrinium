@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Empresa;
+use App\Entity\Sector;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -18,7 +19,7 @@ const PAGE_SIZE = 10;
 class EmpresasController extends AbstractController
 {
     /**
-    * @Route("/empresas", name="get_empresas", methods={"GET"})
+    * @Route("/api/v1/empresas", name="get_empresas", methods={"GET"})
     */
     public function getEmpresas(Request $request): Response
     {   
@@ -59,7 +60,7 @@ class EmpresasController extends AbstractController
     }
 
     /**
-    * @Route("/empresas/{id}", name="get_una_empresa", methods={"GET"})
+    * @Route("/api/v1/empresas/{id}", name="get_una_empresa", methods={"GET"})
     */
     public function getUnaEmpresa(int $id): JsonResponse
     {
@@ -71,7 +72,7 @@ class EmpresasController extends AbstractController
     }
 
     /**
-    * @Route("/empresas", name="add_empresa", methods={"POST"})
+    * @Route("/api/v1/empresas", name="add_empresa", methods={"POST"})
     */
     public function addEmpresa(Request $request): JsonResponse
     {
@@ -83,14 +84,19 @@ class EmpresasController extends AbstractController
             throw new NotFoundHttpException('¡Error de validación!');
         }
 
+        $entityManager = $this->getDoctrine()->getManager();
+        $sectorRepository = $entityManager->getRepository(Sector::class);
+        $sector = $sectorRepository->find($data['sector']);
+        if (empty($sector)) {
+            throw new NotFoundHttpException('¡Sector no encontrado!');
+        }
         $empresa = new Empresa();
         $empresa->setNombre($data['nombre'])
                  ->setTelefono($data['telefono'])
                  ->setEmail($data['email'])
-                 ->setSector($data['sector'])
+                 ->setSector($sector)
                  ->setActivo(true);
-        
-        $entityManager = $this->getDoctrine()->getManager();
+
         $entityManager->persist($empresa);
         $entityManager->flush();
 
@@ -100,7 +106,7 @@ class EmpresasController extends AbstractController
     }
 
     /**
-    * @Route("/empresas/{id}", name="update_empresa", methods={"PUT"})
+    * @Route("/api/v1/empresas/{id}", name="update_empresa", methods={"PUT"})
     */
     public function updateEmpresa(int $id, Request $request): JsonResponse
     {
@@ -110,11 +116,18 @@ class EmpresasController extends AbstractController
         if (!empty($empresa)) {
 
             $data = json_decode($request->getContent(), true);
+            if (!empty($data['sector'])) {
+                $sectorRepository = $entityManager->getRepository(Sector::class);
+                $sector = $sectorRepository->find($data['sector']);
+                if (empty($sector)) {
+                    throw new NotFoundHttpException('¡Sector no encontrado!');
+                }
+                $empresa->setSector($sector);
+            }
 
             empty($data['nombre']) ? true : $empresa->setNombre($data['nombre']);
             empty($data['telefono']) ? true : $empresa->setTelefono($data['telefono']);
             empty($data['email']) ? true : $empresa->setEmail($data['email']);
-            empty($data['sector']) ? true : $empresa->setSector($data['sector']);
 
             $entityManager->flush();
         }
@@ -123,7 +136,7 @@ class EmpresasController extends AbstractController
     }
 
     /**
-    * @Route("/empresas/{id}/activo", name="update_to_active_empresa", methods={"PUT"})
+    * @Route("/api/v1/empresas/{id}/activo", name="update_to_active_empresa", methods={"PUT"})
     */
     public function updateToActiveEmpresa(int $id): JsonResponse
     {
@@ -140,7 +153,7 @@ class EmpresasController extends AbstractController
     }
 
     /**
-    * @Route("/empresas/{id}", name="delete_empresa", methods={"DELETE"})
+    * @Route("/api/v1/empresas/{id}", name="delete_empresa", methods={"DELETE"})
     */
     public function deleteEmpresa(int $id): JsonResponse
     {
@@ -162,7 +175,10 @@ class EmpresasController extends AbstractController
             'nombre' => $empresa->getNombre(),
             'telefono' => $empresa->getTelefono(),
             'email' => $empresa->getEmail(),
-            'sector' => $empresa->getSector(),
+            'sector' => [
+                'id' => $empresa->getSector()->getId(),
+                'nombre' => $empresa->getSector()->getNombre()
+            ]
         ];
     }
 
