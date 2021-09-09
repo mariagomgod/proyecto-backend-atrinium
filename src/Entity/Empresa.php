@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass=EmpresaRepository::class)
- * @ORM\Table(name="empresa")
+ * @ORM\Table(name="empresa",uniqueConstraints={@ORM\UniqueConstraint(name="empresa_nombre_unique_idx", columns={"nombre"}),@ORM\UniqueConstraint(name="empresa_email_unique_idx", columns={"email"})})
  */
 class Empresa
 {
@@ -19,22 +19,23 @@ class Empresa
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=40, nullable=true)
+     * @ORM\Column(type="string", length=40, nullable=false)
      */
     private $nombre;
 
     /**
-     * @ORM\Column(type="string", length=50, nullable=true)
+     * @ORM\Column(type="string", length=50, nullable=false)
      */
     private $telefono;
 
     /**
-     * @ORM\Column(type="string", length=200, nullable=true)
+     * @ORM\Column(type="string", length=200, nullable=false)
      */
     private $email;
 
     /**
-     * @ORM\Column(type="string", length=80, nullable=true)
+     * @ORM\ManyToOne(targetEntity="Sector", cascade={"all"})
+     * @ORM\JoinColumn(name="sector", referencedColumnName="id", nullable=false)
      */
     private $sector;
 
@@ -84,12 +85,12 @@ class Empresa
         return $this;
     }
 
-    public function getSector(): ?string
+    public function getSector(): ?int
     {
         return $this->sector;
     }
 
-    public function setSector(?string $sector): self
+    public function setSector(?int $sector): self
     {
         $this->sector = $sector;
 
