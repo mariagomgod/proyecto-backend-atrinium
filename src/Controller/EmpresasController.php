@@ -10,7 +10,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Doctrine\ORM\EntityRepository;
 
 const CLASE_EMPRESA = 'App\Entity\Empresa';
@@ -79,17 +79,17 @@ class EmpresasController extends AbstractController
     {
         $data = json_decode($request->getContent(), true);
 
-        if (empty($data['nombre']) || empty($data['telefono']) || empty($data['email']) ||
-        empty($data['sector'])) {
+        if (!isset($data['nombre']) || !isset($data['telefono']) || !isset($data['email']) ||
+        !isset($data['sector'])) {
 
-            throw new NotFoundHttpException('¡Error de validación!');
+            throw new BadRequestException('¡Error de validación!');
         }
 
         $entityManager = $this->getDoctrine()->getManager();
         $sectorRepository = $entityManager->getRepository(Sector::class);
         $sector = $sectorRepository->find($data['sector']);
         if (empty($sector)) {
-            throw new NotFoundHttpException('¡Sector no encontrado!');
+            throw new BadRequestException('¡Sector no encontrado!');
         }
         $empresa = new Empresa();
         $empresa->setNombre($data['nombre'])
@@ -116,18 +116,18 @@ class EmpresasController extends AbstractController
         if (!empty($empresa)) {
 
             $data = json_decode($request->getContent(), true);
-            if (!empty($data['sector'])) {
+            if (isset($data['sector'])) {
                 $sectorRepository = $entityManager->getRepository(Sector::class);
                 $sector = $sectorRepository->find($data['sector']);
                 if (empty($sector)) {
-                    throw new NotFoundHttpException('¡Sector no encontrado!');
+                    throw new BadRequestException('¡Sector no encontrado!');
                 }
                 $empresa->setSector($sector);
             }
 
-            empty($data['nombre']) ? true : $empresa->setNombre($data['nombre']);
-            empty($data['telefono']) ? true : $empresa->setTelefono($data['telefono']);
-            empty($data['email']) ? true : $empresa->setEmail($data['email']);
+            isset($data['nombre']) ? $empresa->setNombre($data['nombre']) : true;
+            isset($data['telefono']) ? $empresa->setTelefono($data['telefono']) : true;
+            isset($data['email']) ? $empresa->setEmail($data['email']) : true;
 
             $entityManager->flush();
         }

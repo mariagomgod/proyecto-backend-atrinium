@@ -9,7 +9,8 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpFoundation\Exception\BadRequestException;
+use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Doctrine\ORM\EntityRepository;
 
 const CLASE_SECTOR = 'App\Entity\Sector';
@@ -27,7 +28,7 @@ class SectoresController extends AbstractController
 
         $entityManager = $this->getDoctrine()->getManager();
         $repository = $entityManager->getRepository(CLASE_SECTOR);
-        $sectores = $repository->findBy([], null, self::PAGE_SIZE, self::PAGE_SIZE * ($page - 1));
+        $sectores = $repository->findBy([], ['id' => 'ASC'], self::PAGE_SIZE, self::PAGE_SIZE * ($page - 1));
         // Hago un casting a EntityRepository para poder utilizar count()
         // ya que ObjectRepository es su clase padre y count() sólo está definido en el hijo.
         /** @var EntityRepository $repository */
@@ -64,16 +65,20 @@ class SectoresController extends AbstractController
     public function addSector(Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
+        $nombre = $data['nombre'];
+        if (!isset($nombre)) {
+            throw new BadRequestException('¡Error de validación!');
+        }
 
-        if (empty($data['nombre'])) {
-
-            throw new NotFoundHttpException('¡Error de validación!');
+        $entityManager = $this->getDoctrine()->getManager();
+        $repository = $entityManager->getRepository(CLASE_SECTOR);
+        $existingSector = $repository->findBy(['nombre' => $nombre]);
+        if (!empty($existingSector)) {
+            throw new ConflictHttpException('¡Sector ya existe!');
         }
 
         $sector = new Sector();
-        $sector->setNombre($data['nombre']);
-
-        $entityManager = $this->getDoctrine()->getManager();
+        $sector->setNombre($nombre);
         $entityManager->persist($sector);
         $entityManager->flush();
 
@@ -93,7 +98,7 @@ class SectoresController extends AbstractController
         if (!empty($sector)) {
 
             $data = json_decode($request->getContent(), true);
-            empty($data['nombre']) ? true : $sector->setNombre($data['nombre']);
+            isset($data['nombre']) ? $sector->setNombre($data['nombre']) : true;
         
             $entityManager->flush();
         }
