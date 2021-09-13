@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass=SectorRepository::class)
- * @ORM\Table(name="sector")
+ * @ORM\Table(name="sector",uniqueConstraints={@ORM\UniqueConstraint(name="sector_nombre_unique_idx", columns={"nombre"})})
  */
 class Sector
 {
