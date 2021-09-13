@@ -27,7 +27,7 @@ class EmpresasController extends AbstractController
         $empresa = $request->query->get('empresa');
         $sector = $request->query->get('sector');
         $page = $request->query->get('page', 1); // página actual.
-        $criteria = ['activo' => true];
+        $criteria = [];
 
         if (!empty($empresa)) {
             // si se indica un nombre de empresa, se filtra por nombre de empresa.
@@ -95,8 +95,7 @@ class EmpresasController extends AbstractController
         $empresa->setNombre($data['nombre'])
                  ->setTelefono($data['telefono'])
                  ->setEmail($data['email'])
-                 ->setSector($sector)
-                 ->setActivo(true);
+                 ->setSector($sector);
 
         $entityManager->persist($empresa);
         $entityManager->flush();
@@ -137,23 +136,6 @@ class EmpresasController extends AbstractController
     }
 
     /**
-    * @Route("/api/v1/empresas/{id}/activo", name="update_to_active_empresa", methods={"PUT"})
-    */
-    public function updateToActiveEmpresa(int $id): JsonResponse
-    {
-        $entityManager = $this->getDoctrine()->getManager();
-        $empresa = $entityManager->find(CLASE_EMPRESA, $id);
-        
-        if (!empty($empresa)) {
-
-            $empresa->setActivo(true);
-            $entityManager->flush();
-        }
-
-        return new JsonResponse(['status' => '¡Empresa activada!'], Response::HTTP_NO_CONTENT);
-    }
-
-    /**
     * @Route("/api/v1/empresas/{id}", name="delete_empresa", methods={"DELETE"})
     */
     public function deleteEmpresa(int $id): JsonResponse
@@ -163,7 +145,7 @@ class EmpresasController extends AbstractController
         
         if (!empty($empresa)) {
 
-            $empresa->setActivo(false);
+            $entityManager->remove($empresa);
             $entityManager->flush();
         }
 

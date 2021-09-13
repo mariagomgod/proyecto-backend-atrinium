@@ -24,15 +24,14 @@ class SectoresController extends AbstractController
     public function getSectores(Request $request): Response
     {   
         $page = $request->query->get('page', 1); // página actual.
-        $criteria = ['activo' => true];
 
         $entityManager = $this->getDoctrine()->getManager();
         $repository = $entityManager->getRepository(CLASE_SECTOR);
-        $sectores = $repository->findBy($criteria, null, self::PAGE_SIZE, self::PAGE_SIZE * ($page - 1));
+        $sectores = $repository->findBy([], null, self::PAGE_SIZE, self::PAGE_SIZE * ($page - 1));
         // Hago un casting a EntityRepository para poder utilizar count()
         // ya que ObjectRepository es su clase padre y count() sólo está definido en el hijo.
         /** @var EntityRepository $repository */
-        $sectoresCount = $repository->count($criteria); // empresas totales.
+        $sectoresCount = $repository->count([]); // sectores totales.
         $totalPages = ceil($sectoresCount / self::PAGE_SIZE);
 
         $data = [ // cuerpo de la respuesta.
@@ -72,8 +71,7 @@ class SectoresController extends AbstractController
         }
 
         $sector = new Sector();
-        $sector->setNombre($data['nombre'])
-                ->setActivo(true);
+        $sector->setNombre($data['nombre']);
 
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->persist($sector);
@@ -104,23 +102,6 @@ class SectoresController extends AbstractController
     }
 
     /**
-    * @Route("/api/v1/sectores/{id}/activo", name="update_to_active_sector", methods={"PUT"})
-    */
-    public function updateToActiveSector(int $id): JsonResponse
-    {
-        $entityManager = $this->getDoctrine()->getManager();
-        $sector = $entityManager->find(CLASE_SECTOR, $id);
-        
-        if (!empty($sector)) {
-
-            $sector->setActivo(true);
-            $entityManager->flush();
-        }
-
-        return new JsonResponse(['status' => '¡Sector activado!'], Response::HTTP_NO_CONTENT);
-    }
-
-    /**
     * @Route("/api/v1/sectores/{id}", name="delete_sector", methods={"DELETE"})
     */
     public function deleteSector(int $id): JsonResponse
@@ -130,7 +111,7 @@ class SectoresController extends AbstractController
         
         if (!empty($sector)) {
 
-            $sector->setActivo(false);
+            $entityManager->remove($sector);
             $entityManager->flush();
         }
 

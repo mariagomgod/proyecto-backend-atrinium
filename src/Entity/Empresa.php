@@ -39,11 +39,6 @@ class Empresa
      */
     private $sector;
 
-    /**
-     * @ORM\Column(type="boolean", nullable=false)
-     */
-    private $activo;
-
     public function getId(): ?int
     {
         return $this->id;
@@ -93,18 +88,6 @@ class Empresa
     public function setSector(?Sector $sector): self
     {
         $this->sector = $sector;
-
-        return $this;
-    }
-
-    public function getActivo(): ?bool
-    {
-        return $this->activo;
-    }
-
-    public function setActivo(bool $activo): self
-    {
-        $this->activo = $activo;
 
         return $this;
     }

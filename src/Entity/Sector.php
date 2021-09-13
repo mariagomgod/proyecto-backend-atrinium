@@ -23,11 +23,6 @@ class Sector
      */
     private $nombre;
 
-    /**
-     * @ORM\Column(type="boolean", nullable=false)
-     */
-    private $activo;
-
     public function getId(): ?int
     {
         return $this->id;
@@ -41,18 +36,6 @@ class Sector
     public function setNombre(?string $nombre): self
     {
         $this->nombre = $nombre;
-
-        return $this;
-    }
-
-    public function getActivo(): ?bool
-    {
-        return $this->activo;
-    }
-
-    public function setActivo(bool $activo): self
-    {
-        $this->activo = $activo;
 
         return $this;
     }
