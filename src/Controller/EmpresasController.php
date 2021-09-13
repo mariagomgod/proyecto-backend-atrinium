@@ -14,10 +14,11 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Doctrine\ORM\EntityRepository;
 
 const CLASE_EMPRESA = 'App\Entity\Empresa';
-const PAGE_SIZE = 10;
 
 class EmpresasController extends AbstractController
 {
+    const PAGE_SIZE = 10;
+
     /**
     * @Route("/api/v1/empresas", name="get_empresas", methods={"GET"})
     */
@@ -40,12 +41,12 @@ class EmpresasController extends AbstractController
 
         $entityManager = $this->getDoctrine()->getManager();
         $repository = $entityManager->getRepository(CLASE_EMPRESA);
-        $empresas = $repository->findBy($criteria, null, PAGE_SIZE, PAGE_SIZE * ($page - 1));
+        $empresas = $repository->findBy($criteria, null, self::PAGE_SIZE, self::PAGE_SIZE * ($page - 1));
         // Hago un casting a EntityRepository para poder utilizar count()
         // ya que ObjectRepository es su clase padre y count() sólo está definido en el hijo.
         /** @var EntityRepository $repository */
         $empresasCount = $repository->count($criteria); // empresas totales.
-        $totalPages = ceil($empresasCount / PAGE_SIZE);
+        $totalPages = ceil($empresasCount / self::PAGE_SIZE);
 
         $data = [ // cuerpo de la respuesta.
             'currentPage' => $page,
@@ -53,7 +54,7 @@ class EmpresasController extends AbstractController
             'pageResults' => $this->empresasToArray($empresas),
             'totalCount' => $empresasCount,
             'currentPageSize' => count($empresas),
-            'maxPageSize' => PAGE_SIZE
+            'maxPageSize' => self::PAGE_SIZE
         ];
 
         return new JsonResponse($data);

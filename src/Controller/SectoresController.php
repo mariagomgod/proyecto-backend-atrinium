@@ -13,10 +13,11 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Doctrine\ORM\EntityRepository;
 
 const CLASE_SECTOR = 'App\Entity\Sector';
-const PAGE_SIZE = 10;
 
 class SectoresController extends AbstractController
 {
+    const PAGE_SIZE = 10;
+
     /**
     * @Route("/api/v1/sectores", name="get_sectores", methods={"GET"})
     */
@@ -27,12 +28,12 @@ class SectoresController extends AbstractController
 
         $entityManager = $this->getDoctrine()->getManager();
         $repository = $entityManager->getRepository(CLASE_SECTOR);
-        $sectores = $repository->findBy($criteria, null, PAGE_SIZE, PAGE_SIZE * ($page - 1));
+        $sectores = $repository->findBy($criteria, null, self::PAGE_SIZE, self::PAGE_SIZE * ($page - 1));
         // Hago un casting a EntityRepository para poder utilizar count()
         // ya que ObjectRepository es su clase padre y count() sólo está definido en el hijo.
         /** @var EntityRepository $repository */
         $sectoresCount = $repository->count($criteria); // empresas totales.
-        $totalPages = ceil($sectoresCount / PAGE_SIZE);
+        $totalPages = ceil($sectoresCount / self::PAGE_SIZE);
 
         $data = [ // cuerpo de la respuesta.
             'currentPage' => $page,
@@ -40,7 +41,7 @@ class SectoresController extends AbstractController
             'pageResults' => $this->sectoresToArray($sectores),
             'totalCount' => $sectoresCount,
             'currentPageSize' => count($sectores),
-            'maxPageSize' => PAGE_SIZE
+            'maxPageSize' => self::PAGE_SIZE
         ];
 
         return new JsonResponse($data);
