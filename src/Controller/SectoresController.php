@@ -25,10 +25,13 @@ class SectoresController extends AbstractController
     public function getSectores(Request $request): Response
     {   
         $page = $request->query->get('page', 1); // página actual.
+        $getAll = $request->query->get('all', false); // devolver todos?
 
         $entityManager = $this->getDoctrine()->getManager();
         $repository = $entityManager->getRepository(CLASE_SECTOR);
-        $sectores = $repository->findBy([], ['id' => 'ASC'], self::PAGE_SIZE, self::PAGE_SIZE * ($page - 1));
+        $pageSize = $getAll ? null : self::PAGE_SIZE;
+        $offset = $getAll ? null : self::PAGE_SIZE * ($page - 1);
+        $sectores = $repository->findBy([], ['id' => 'ASC'], $pageSize, $offset);
         // Hago un casting a EntityRepository para poder utilizar count()
         // ya que ObjectRepository es su clase padre y count() sólo está definido en el hijo.
         /** @var EntityRepository $repository */

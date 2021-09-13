@@ -34,7 +34,7 @@ class Empresa
     private $email;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Sector", cascade={"all"})
+     * @ORM\ManyToOne(targetEntity="Sector", cascade={"detach"})
      * @ORM\JoinColumn(name="sector", referencedColumnName="id", nullable=false)
      */
     private $sector;
